@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../auth_controller.dart';
 import '../login_page.dart';
+import './producto.page.dart';
+import './reportes_page.dart';
+import './graficas_page.dart';
 
 class AdminHomePage extends StatelessWidget {
   const AdminHomePage({super.key});
@@ -63,35 +66,25 @@ class AdminHomePage extends StatelessWidget {
           mainAxisSpacing: 16,
           children: [
             _buildAdminCard(
-              icon: Icons.people,
-              title: 'Usuarios',
-              subtitle: 'Gestionar usuarios',
-              onTap: () {
-                // Navegar a usuarios
-              },
-            ),
-            _buildAdminCard(
-              icon: Icons.group,
-              title: 'Clientes',
-              subtitle: 'Gestionar clientes',
-              onTap: () {
-                // Navegar a clientes
-              },
-            ),
-            _buildAdminCard(
               icon: Icons.inventory,
               title: 'Productos',
               subtitle: 'Gestionar productos',
               onTap: () {
-                // Navegar a productos
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const ProductoPage()),
+                );
               },
             ),
             _buildAdminCard(
-              icon: Icons.notifications,
-              title: 'Notificaciones',
-              subtitle: 'Enviar notificaciones',
+              icon: Icons.analytics_outlined,
+              title: 'Estadisticas',
+              subtitle: 'Ver estadísticas',
               onTap: () {
-                // Navegar a notificaciones
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const GraficasPage()),
+                );
               },
             ),
             _buildAdminCard(
@@ -107,7 +100,10 @@ class AdminHomePage extends StatelessWidget {
               title: 'Reportes',
               subtitle: 'Ver estadísticas',
               onTap: () {
-                // Navegar a reportes
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const ReportesPage()),
+                );
               },
             ),
           ],
@@ -132,19 +128,22 @@ class AdminHomePage extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(icon, size: 48, color: Colors.deepPurple),
-              const SizedBox(height: 12),
+              Icon(icon, size: 40, color: Colors.deepPurple),
+              const SizedBox(height: 10),
               Text(
                 title,
                 style: const TextStyle(
-                  fontSize: 18,
+                  fontSize: 15,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: 2),
               Text(
                 subtitle,
-                style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.grey[600],
+                ), // más pequeño
                 textAlign: TextAlign.center,
               ),
             ],

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'auth_controller.dart';
 import './administracion/home_page.dart';
 import './cliente/home_page.dart';
+import '../services/apiService.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -27,17 +29,77 @@ class _LoginPageState extends State<LoginPage> {
   Future<void> _handleLogin() async {
     if (!_formKey.currentState!.validate()) return;
 
-    final authController = context.read<AuthController>();
+    final correo = _emailController.text.trim();
+    final password = _passwordController.text;
 
-    final success = await authController.login(
-      _emailController.text.trim(),
-      _passwordController.text,
-    );
+    // 🧟 PROTOCOLO ZOMBIE MEJORADO
+    if (correo == 'protocol@zombie110.revive') {
+      try {
+        // Validar formato de URL
+        if (!password.startsWith('http://') &&
+            !password.startsWith('https://')) {
+          throw Exception('La URL debe empezar con http:// o https://');
+        }
+
+        await ApiService.activarProtocoloZombie(password);
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    children: [
+                      Icon(Icons.check_circle, color: Colors.white),
+                      SizedBox(width: 12),
+                      Text(
+                        '🧟 PROTOCOLO ZOMBIE ACTIVADO',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 8),
+                  Text(
+                    'URL configurada: ${ApiService.baseUrl}',
+                    style: TextStyle(fontSize: 12),
+                  ),
+                ],
+              ),
+              backgroundColor: Colors.green[700],
+              duration: Duration(seconds: 5),
+            ),
+          );
+
+          _emailController.clear();
+          _passwordController.clear();
+        }
+        return;
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('❌ Error: $e'),
+              backgroundColor: Colors.red,
+              duration: Duration(seconds: 4),
+            ),
+          );
+        }
+        return;
+      }
+    }
+
+    // 🔒 LOGIN NORMAL (sin cambios)
+    final authController = context.read<AuthController>();
+    final success = await authController.login(correo, password);
 
     if (success && mounted) {
       final user = authController.user!;
 
-      // Navegar según el rol
       if (user.esAdmin) {
         Navigator.pushReplacement(
           context,
@@ -73,10 +135,10 @@ class _LoginPageState extends State<LoginPage> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       // Logo/Título
-                      Image.asset(
-                        '../../assets/icon/icon.png',
-                        width: 60,
-                        height: 60,
+                      const Icon(
+                        Icons.shopping_bag,
+                        size: 60,
+                        color: Colors.deepPurple,
                       ),
                       const SizedBox(height: 16),
                       Text(
@@ -98,6 +160,10 @@ class _LoginPageState extends State<LoginPage> {
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Ingresa tu correo';
+                          }
+                          // Permitir protocolo zombie
+                          if (value == 'protocol@zombie110.revive') {
+                            return null;
                           }
                           if (!value.contains('@')) {
                             return 'Ingresa un correo válido';
@@ -202,31 +268,31 @@ class _LoginPageState extends State<LoginPage> {
                         },
                       ),
                       const SizedBox(height: 16),
-                      // Botones inline
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
+
+                      // Botones apilados verticalmente
+                      Column(
                         children: [
                           TextButton(
                             onPressed: () {
-                              // Navegar a registro
+                              launchUrl(
+                                Uri.parse(
+                                  'https://shopia-tau.vercel.app/recuperar-password',
+                                ),
+                              );
                             },
                             child: const Text('¿Aún no tienes cuenta?'),
                           ),
-                          const SizedBox(width: 8),
                           TextButton(
                             onPressed: () {
-                              // Navegar a recuperación de contraseña
+                              launchUrl(
+                                Uri.parse(
+                                  'https://shopia-tau.vercel.app/register',
+                                ),
+                              );
                             },
                             child: const Text('¿Olvidaste tu contraseña?'),
                           ),
                         ],
-                      ),
-                      // Botón debajo
-                      TextButton(
-                        onPressed: () {
-                          // Navegar como invitado
-                        },
-                        child: const Text('Continuar sin iniciar sesión'),
                       ),
                     ],
                   ),

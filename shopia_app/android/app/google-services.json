@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "340502300857",
+    "project_id": "shopia-110",
+    "storage_bucket": "shopia-110.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:340502300857:android:d7ae462b35907f70913368",
+        "android_client_info": {
+          "package_name": "com.shopia.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBakOMAHD0Z3J1WHmbee-zaoB-9cFNVhII"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

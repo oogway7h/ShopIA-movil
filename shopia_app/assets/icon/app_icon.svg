@@ -1,0 +1,23 @@
+
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1E3A8A"/>
+      <stop offset="55%" stop-color="#2563EB"/>
+      <stop offset="100%" stop-color="#60A5FA"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Fondo COMPLETAMENTE CUADRADO (sin rx/ry) -->
+  <rect x="0" y="0" width="1024" height="1024" fill="url(#bg)"/>
+  
+  <!-- Símbolo más pequeño y centrado (70% del área) -->
+  <g fill="none" stroke="#FFFFFF" stroke-width="50" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Bolsa de compra -->
+    <rect x="360" y="420" width="304" height="280" rx="40" ry="40"/>
+    <!-- Asa -->
+    <path d="M410 420 C 422 360, 602 360, 614 420"/>
+    <!-- Check -->
+    <path d="M440 570 L 512 635 L 620 520"/>
+  </g>
+</svg>

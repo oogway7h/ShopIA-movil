@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../models/user.dart';
-import '../../services/apiService.dart';
+import '../models/user.dart';
+import '../services/apiService.dart';
+import '../services/firebase_messaging_service.dart';
+import 'dart:convert';
 
 class AuthController extends ChangeNotifier {
   final ApiService _api = ApiService();
@@ -31,8 +33,12 @@ class AuthController extends ChangeNotifier {
       _token = response['access'];
       _user = User.fromJson(response['usuario']);
 
-      // Guardar en almacenamiento local
+      ApiService.token = _token;
+
       await _saveToStorage();
+
+      // 🆕 Enviar token FCM después del login exitoso
+      await FirebaseMessagingService.enviarTokenAlBackend();
 
       _setLoading(false);
       return true;
@@ -47,12 +53,13 @@ class AuthController extends ChangeNotifier {
   Future<void> logout() async {
     _user = null;
     _token = null;
+    ApiService.token = null;
     _error = null;
     await _clearStorage();
     notifyListeners();
   }
 
-  // Cargar datos guardados al iniciar app
+  // Cuando cargas usuario guardado:
   Future<void> loadSavedUser() async {
     final prefs = await SharedPreferences.getInstance();
     final savedToken = prefs.getString('token');
@@ -61,12 +68,12 @@ class AuthController extends ChangeNotifier {
     if (savedToken != null && savedUserJson != null) {
       try {
         _token = savedToken;
-        _user = User.fromJson(
-          Map<String, dynamic>.from(
-            // Simple parsing, en producción usa json.decode
-            {},
-          ),
-        );
+        ApiService.token = _token;
+        _user = User.fromJson(json.decode(savedUserJson));
+
+        // 🆕 Enviar token FCM si el usuario ya estaba logueado
+        await FirebaseMessagingService.enviarTokenAlBackend();
+
         notifyListeners();
       } catch (e) {
         await _clearStorage();
@@ -83,8 +90,19 @@ class AuthController extends ChangeNotifier {
   Future<void> _saveToStorage() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('token', _token!);
-    // En producción, serializa el user completo
-    await prefs.setString('user', _user!.correo);
+    await prefs.setString(
+      'user',
+      json.encode({
+        'id': _user!.id,
+        'correo': _user!.correo,
+        'nombre': _user!.nombre,
+        'apellido': _user!.apellido,
+        'roles': _user!.roles.map((r) => {'nombre': r}).toList(),
+        'telefono': _user!.telefono,
+        'sexo': _user!.sexo,
+        'estado': _user!.estado,
+      }),
+    );
   }
 
   Future<void> _clearStorage() async {
